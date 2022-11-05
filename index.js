@@ -1,9 +1,9 @@
 'use strict';
 
 require('dotenv').config();
-const { start } = require('./lib/server.js');
-const { api_db } = require('./lib/models');
-const { auth_db } = require('./lib/auth/models');
+const { start } = require('./src/server.js');
+const { api_db } = require('./src/auth/models');
+const { auth_db } = require('./src/auth/models');
 const PORT = process.env.PORT
 
 auth_db.sync()

@@ -1,7 +1,7 @@
 'use strict';
 
 const express = require('express');
-const dataModules = require('../models');
+const dataModules = require('../auth/models');
 const bearerAuth = require('./../auth/auth-middleware/bearer.js')
 const permissions = require('./../auth/auth-middleware/acl.js');
 
