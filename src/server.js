@@ -3,13 +3,12 @@
 const express = require('express');
 const cors = require('cors');
 
-
-const authRoutes = require('./auth/routes.js');
+const authRoutes = require('./routes/authRoutes.js');
 const v1 = require('./routes/v1.js');
 const v2 = require('./routes/v2.js');
-const bearer = require('./auth/middleware/bearer.js');
+const bearer = require('./auth/auth-middleware/bearer.js');
 
-const logger = require('./middleware/logger.js');
+const logger = require('./auth/auth-middleware/logger.js');
 const notFoundHandler = require('./error-handlers/404.js');
 const errorHandler = require('./error-handlers/500.js');
 
