@@ -1,69 +1,172 @@
 # LAB -  API Integration
 
-**To Do List Manager Phase 4:** Integrating with a live API
+# ToDo
 
-In this final phase, we'll be requiring that users be logged in through a live authentication server, in order to see the to do items. Additionally, based on their user type, they will be allowed (or denied) to perform actions such as editing or deleting them. All To Do items will be stored in a database, accessed through a deployed API
+**Author**: Brooke Heck
 
-## Before you begin
+**Version**: 1.0.0
 
-Refer to *Getting Started*  in the [lab submission instructions](../../../reference/submission-instructions/labs/README.md) for complete setup, configuration, deployment, and submission instructions.
+## Overview
+This is a REST api that stores users and the tasks that they create in a SQL database. The users can sign up, which will create a new user record in the users table. The sign in route will authenticate the user with basic auth. To get, add, update, and delete tasks, the user must use bearer auth. Users are given user capabilities by default. This means they can only change the todo list associated with their id. In order to see and manage all the users, an admin must be logged in.
 
-> Building off of your previous day's branch, create a new branch for today called 'auth' and continue to work in your 'todo' repository.
+## Deployed Server
+[https://todo-server-401.herokuapp.com/](https://todo-server-401.herokuapp.com/)
 
-## Business Requirements
+## Architecture and Routes
 
-Refer to the [To Do System Overview](../../apps-and-libraries/todo/README.md) for a complete review of the application, including Business and Technical requirements along with the development roadmap.
+### User Routes
+- base URL: https://todo-server-401.herokuapp.com/
+- Sign UP: POST /signup
+    - send the username and password in the request
+    - returns a user record with the token attached
+    - example request with axios
+    ```js
+    const config = {
+      method: 'post',
+      url: 'https://todo-server-401.herokuapp.com/signup',
+      data: {
+        username: 'user',
+        password: 'foo'
+      }
+    }
+    const response = await axios(config);
+    ```
+    - example response
+    ```js
+    response.data = {
+      user: {
+        username: 'user',
+        password: 'foo',
+        id: 1,
+        token: '<jsonwebtoken>',
+        role: 'user'
+      },
+      token: '<jsonwebtoken>'
+    }
+    ```
+- Sign IN: POST /signin
+    - send the username and password in the header as basic auth
+        - 'authorization': 'Basic username-base64-encoded:password-base64-encoded'
+    - returns a user record with the token attached
+    - example request with axios
+    ```js
+    const config = {
+      method: 'post',
+      url: 'https://todo-server-401.herokuapp.com/signin',
+      auth: {
+        username: 'user',
+        password: 'foo'
+      }
+    }
+    const response = await axios(config);
+    ```
+    - example response
+    ```js
+    response.data = {
+      user: {
+        username: 'user',
+        password: 'foo',
+        id: 1,
+        token: '<jsonwebtoken>',
+        role: 'user'
+      },
+      token: '<jsonwebtoken>'
+    }
+    ```
 
-## Phase 4 Requirements
-
-In Phase 4, we will finalize the functionality of the application by connecting to live servers for login, authorization, and data access
-
-## Technical Requirements / Notes
-
-> Technical requirements for the core application are unchanged from the prior phases, with the addition of Performing actual HTTP requests with an Authenticated API server:
-
-1. Alter the Add, Toggle Complete, and Delete functions within your to do application to use your API instead of in memory state.
-   - Fetch the current list of items from the database on application start
-   - Whenever you add/update/delete an item, refresh the state so the user can instantly see the change
-     - Consider: Do you re-fetch from the server every time you make a change?
-       - If so, how?
-       - If not, how will you stay in sync?
-
-1. Alter the Login Context to use the server to login users instead of our mock users list.
-   - Be sure to store the token in state as well as in a cookie so you can reference it later.
-
-### Stretch Goal
-
-Use authorization middleware on the server to add another layer of protection, so that only users with the correct permissions can POST/UPDATE/DELETE.
-
-If you choose to do this, you'll need to send a bearer token with every request...
-
-### API Server
-
-- You will need deployed API Server, which implements a todo item data model
-  - `GET /todo`: Gets a list of all items
-  - 'POST /todo': Adds an item
-  - 'PUT /todo': Updates an item (you'll use this to mark them as complete)
-  - 'DELETE /todo/:id' : Deletes an item
-
-### Authentication Server
-
-- You will need a deployed Authenticated API Server, which supports:
-  - Registration (`/signup`)
-  - Login (`/signin`)
-  - Authorization (via Bearer Token)
-  - ACL (using user roles)
-    - Make sure you have created the user roles and permissions lists that your front-end is expecting to tap into
-  - To Do data model for storing the actual to do items
-
-### Testing
-
-- Write unit tests for the Login Context Component
-- Write unit tests for the Login/Auth components
-  - Hide/Show based on status
-- You will need to create some mocking interface to fake a server/login to simulate.
-- Tests should assert all behavioral functionality
-
-### Assignment Submission Instructions
-
-Refer to the the [Submitting React Apps Lab Submission Instructions](../../../reference/submission-instructions/labs/react-apps.md) for the complete lab submission process and expectations
+### CRUD Task Routes
+- Base URL 'https://todo-server-401.herokuapp.com/api/v1
+- Read Tasks: GET /tasks/:user_id
+    - send the user id as a parameter
+    - returns a list of tasks that are associated with user id
+    - example request with axios
+    ```js
+    const config = {
+      method: 'get',
+      url: 'https://todo-server-401.herokuapp.com/api/v1/tasks/1',
+    }
+    const response = await axios(config);
+    ```
+    - example response
+    ```js
+    response.data = {
+      [
+        {
+          id: 1,
+          user_id: 1,
+          text: 'do the dishes',
+          assignee: 'user',
+          complete: false,
+          difficulty: 5
+        }
+      ]
+    }
+    ```
+- Create Task: POST /tasks
+    - send the task as a json object in the body
+    - returns the task record
+    - example request with axios
+    ```js
+    const config = {
+      method: 'post',
+      url: 'https://todo-server-401.herokuapp.com/api/v1/tasks',
+      data: {
+        user_id: 1,
+        text: 'do the dishes',
+        assignee: 'user',
+        complete: false,
+        difficulty: 5
+      }
+    }
+    const response = await axios(config);
+    ```
+    - example response
+    ```js
+    response.data = {
+      id: 1,
+      user_id: 1,
+      text: 'do the dishes',
+      assignee: 'user',
+      complete: false,
+      difficulty: 5
+    }
+    ```
+- Update Task: PUT /tasks/:task_id
+    - send the task as a json object in the body
+    - returns the task record
+    - example request with axios
+    ```js
+    const config = {
+      method: 'put',
+      url: 'https://todo-server-401.herokuapp.com/api/v1/tasks/1',
+      data: {
+        user_id: 1,
+        text: 'do the dishes',
+        assignee: 'user',
+        complete: true,
+        difficulty: 5
+      }
+    }
+    const response = await axios(config);
+    ```
+    - example response
+    ```js
+    response.data = {
+      id: 1,
+      user_id: 1,
+      text: 'do the dishes',
+      assignee: 'user',
+      complete: true,
+      difficulty: 5
+    }
+    ```
+- Delete Task: DELETE /tasks/:task_id
+    - send the task id as a parameter
+    - example request with axios
+    ```js
+    const config = {
+      method: 'delete',
+      url: 'https://todo-server-401.herokuapp.com/api/v1/tasks/1'
+    }
+    await axios(config);
+    ```
