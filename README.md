@@ -2,10 +2,6 @@
 
 # ToDo
 
-**Author**: Brooke Heck
-
-**Version**: 1.0.0
-
 ## Overview
 This is a REST api that stores users and the tasks that they create in a SQL database. The users can sign up, which will create a new user record in the users table. The sign in route will authenticate the user with basic auth. To get, add, update, and delete tasks, the user must use bearer auth. Users are given user capabilities by default. This means they can only change the todo list associated with their id. In order to see and manage all the users, an admin must be logged in.
 
